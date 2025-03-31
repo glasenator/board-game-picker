@@ -1,8 +1,123 @@
 document.addEventListener("DOMContentLoaded", () => {
     const gameListContainer = document.getElementById("game-list");
     const sortOptions = document.getElementById("sort-options");
+    const sortOrderButton = document.getElementById("sort-order");
+    const sortArrow = document.getElementById("sort-arrow");
+    const filterNameInput = document.getElementById("filter-name");
+    const filterPlayerCount = document.getElementById("filter-playercount");
+    const filterRating = document.getElementById("filter-rating");
+    const filterPlayingTime = document.getElementById("filter-playingtime");
+    const filterComplexity = document.getElementById("filter-weight");
+    let reverseOrder = false;
 
-    sortOptions.addEventListener("change", () => {
+    const detailDrawer = document.getElementById("detail-drawer");
+    const closeDrawerButton = document.getElementById("close-drawer");
+    const detailTitle = document.getElementById("detail-title");
+    const detailImage = document.getElementById("detail-image");
+    const detailDescription = document.getElementById("detail-description");
+    const detailPlayers = document.getElementById("detail-players");
+    const detailTime = document.getElementById("detail-time");
+    const detailComplexity = document.getElementById("detail-weight");
+    const detailRating = document.getElementById("detail-rating");
+    const detailCategories = document.getElementById("detail-categories");
+
+    closeDrawerButton.addEventListener("click", () => {
+        detailDrawer.classList.remove("open");
+    });
+
+    async function openDrawer(id) {
+        try {
+            const response = await fetch(`https://boardgamegeek.com/xmlapi2/thing?id=${id}`);
+            if (!response.ok) throw new Error("Failed to fetch game details");
+
+            const text = await response.text();
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(text, "application/xml");
+
+            const name = xml.querySelector("name[type='primary']")?.getAttribute("value") || "Unknown Game";
+            const description = xml.querySelector("description")?.textContent || "No description available.";
+            const minPlayers = xml.querySelector("minplayers")?.getAttribute("value") || "N/A";
+            const maxPlayers = xml.querySelector("maxplayers")?.getAttribute("value") || "N/A";
+            const playingTime = xml.querySelector("playingtime")?.getAttribute("value") || "N/A";
+            const weight = xml.querySelector("averageweight")?.getAttribute("value") || "N/A";
+            const rating = xml.querySelector("average")?.getAttribute("value") || "N/A";
+            const imageUrl = xml.querySelector("image")?.textContent || "";
+            const boardGameCategories = xml.querySelectorAll("link[type='boardgamecategory']");
+
+            if (detailTitle) detailTitle.textContent = name;
+            if (detailImage) {
+                detailImage.src = imageUrl;
+                detailImage.alt = name;
+            }
+            if (detailDescription) detailDescription.textContent = description;
+            if (detailPlayers) {
+                detailPlayers.textContent = minPlayers === maxPlayers 
+                    ? `${minPlayers} players` 
+                    : `${minPlayers} - ${maxPlayers} players`;
+            }
+            if (detailTime) detailTime.textContent = `${playingTime} mins`;
+            if (detailComplexity) detailComplexity.textContent = weight;
+            if (detailRating) detailRating.textContent = rating;
+            if (detailCategories) {
+                const categories = Array.from(boardGameCategories).map(cat => cat.getAttribute("value")).join(", ");
+                detailCategories.textContent = categories;
+            }
+
+            detailDrawer.classList.add("open");
+        } catch (error) {
+            console.error("Error fetching game details:", error);
+            detailDrawer.classList.remove("open");
+        }
+    }
+
+    sortOptions.addEventListener("change", sortGames);
+    sortOrderButton.addEventListener("click", () => {
+        reverseOrder = !reverseOrder;
+        sortArrow.textContent = reverseOrder ? "⬆️" : "⬇️";
+        sortGames();
+    });
+
+    filterNameInput.addEventListener("input", filterGames);
+    filterPlayerCount.addEventListener("change", filterGames);
+    filterRating.addEventListener("change", filterGames);
+    filterPlayingTime.addEventListener("change", filterGames);
+    filterComplexity.addEventListener("change", filterGames);
+
+    function filterGames() {
+        const filterText = filterNameInput.value.toLowerCase();
+        const selectedPlayerCount = filterPlayerCount.value;
+        const selectedRating = filterRating.value;
+        const selectedPlayingTime = filterPlayingTime.value;
+        const selectedComplexity = filterComplexity.value;
+        const gameItems = Array.from(gameListContainer.children);
+
+        gameItems.forEach(gameItem => {
+            const gameName = gameItem.querySelector("h2").textContent.toLowerCase();
+            const playerCountText = gameItem.querySelector(".player-count").textContent;
+            const playerCounts = playerCountText.match(/\d+/g).map(Number);
+            const gameRating = parseFloat(gameItem.querySelector(".rating").textContent) || 0;
+            const gamePlayingTime = parseInt(gameItem.querySelector(".playing-time").textContent.match(/\d+/)) || 0;
+
+            // Fix: Ensure `.weight` element is correctly parsed
+            const weightElement = gameItem.querySelector(".weight .weight-bars");
+            const activeBars = weightElement ? weightElement.querySelectorAll(".weight-bar.active").length : 0;
+            const gameComplexity = activeBars;
+
+            const matchesPlayerCount = !selectedPlayerCount || 
+                (playerCounts.length === 2 
+                    ? selectedPlayerCount >= playerCounts[0] && selectedPlayerCount <= playerCounts[1]
+                    : selectedPlayerCount == playerCounts[0]);
+
+            const matchesRating = !selectedRating || gameRating >= parseFloat(selectedRating);
+            const matchesPlayingTime = !selectedPlayingTime || gamePlayingTime >= parseInt(selectedPlayingTime);
+            const matchesComplexity = !selectedComplexity || gameComplexity === parseFloat(selectedComplexity);
+            const matchesName = gameName.includes(filterText);
+
+            gameItem.style.display = matchesName && matchesPlayerCount && matchesRating && matchesPlayingTime && matchesComplexity ? "" : "none";
+        });
+    }
+
+    function sortGames() {
         const sortBy = sortOptions.value;
         const gameItems = Array.from(gameListContainer.children);
 
@@ -19,7 +134,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 case "playtime":
                     return parseInt(gameItem.querySelector(".playing-time").textContent.match(/\d+/)) || 0;
                 case "weight":
-                    return parseFloat(gameItem.querySelector(".weight")?.textContent.match(/\d+(\.\d+)?/)) || 0; // Handle weight
+                    // Fix: Parse the number of active weight bars for complexity
+                    const weightElement = gameItem.querySelector(".weight .weight-bars");
+                    return weightElement ? weightElement.querySelectorAll(".weight-bar.active").length : 0;
                 default:
                     return 0;
             }
@@ -28,15 +145,14 @@ document.addEventListener("DOMContentLoaded", () => {
         gameItems.sort((a, b) => {
             const valueA = getSortValue(a, sortBy);
             const valueB = getSortValue(b, sortBy);
-            if (typeof valueA === "string") {
-                return valueA.localeCompare(valueB);
-            }
-            return valueA - valueB;
+            let comparison = typeof valueA === "string" ? valueA.localeCompare(valueB) : valueA - valueB;
+            return reverseOrder ? -comparison : comparison;
         });
 
         gameListContainer.innerHTML = "";
         gameItems.forEach(item => gameListContainer.appendChild(item));
-    });
+        filterGames(); // Ensure filtering is applied after sorting
+    }
 
     async function fetchGameDetails(gameId, games) {
         console.log("Fetching game details for ID:", gameId);
@@ -108,6 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             items.forEach(item => {
                 const name = item.querySelector("name")?.textContent || "Unknown Game";
+                const gameId = item.getAttribute("objectid");
                 const imageUrl = item.querySelector("image")?.textContent || "https://media.istockphoto.com/id/1295474183/vector/surprise-mystery-box-icon.jpg?s=612x612&w=0&k=20&c=ebChMCVwLzK6ZL40ZRwRDKmep7fsslAJOIPp9WlsSJI="; // Fallback image
                 const owned = item.querySelector("status")?.getAttribute("own") === "1";
                 console.log(item);
@@ -116,9 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log(`Skipping game ${name} as it is not owned.`);
                     return;
                 }
-
-                const gameItem = document.createElement("div");
-                gameItem.className = "game-item";
 
                 fetchGameDetails(Number(item.getAttribute("objectid")), games).then(details => {
                     const { minPlayers, maxPlayers, playingTime, itemType, rating, weight } = details;
@@ -133,19 +247,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         : `${minPlayers} - ${maxPlayers} players`;
                     const gameUrl = `https://boardgamegeek.com/boardgame/${item.getAttribute("objectid")}`;
 
-                    gameItem.innerHTML = `
-                        <h2>${name}</h2>
-                        <a href="${gameUrl}" class="game-item-content">
-                            <img src="${imageUrl}" alt="${name}" class="game-image">
-                            <div class="game-details">
-                                <div class="player-count">${playerCount}</div>
-                                <div class="playing-time">Playing Time: ${playingTime} mins</div>
-                                <div class="weight">Complexity:${generateWeightBarsHTML(weight || 0)}</div>
-                            </div>
-                            <div class="rating" style="color: hsl(${rating * 12}, 100%, 50%)">${rating}</div>
-                        </a>
-                    `;
-                    gameListContainer.appendChild(gameItem);
+                    gameListContainer.appendChild(createGameCard({
+                        name,
+                        id: item.getAttribute("objectid"),
+                        imageUrl,
+                        minPlayers: details.minPlayers,
+                        maxPlayers: details.maxPlayers,
+                        playingTime: details.playingTime,
+                        weight: details.weight,
+                        rating: details.rating,
+                        description: details.description || "No description available."
+                    }));
                 }).catch(error => {
                     console.error(`Error fetching details for game ${name}:`, error);
                 });
@@ -154,6 +266,25 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Error fetching game collection:", error);
             gameListContainer.innerHTML = `<p>Failed to load game collection. Please try again later.</p>`;
         }
+    }
+
+    function createGameCard(details) {
+        const gameItem = document.createElement("div");
+        gameItem.className = "game-item";
+        gameItem.innerHTML = `
+            <h2>${details.name}</h2>
+            <div class="game-item-content">
+                <img src="${details.imageUrl}" alt="${details.name}" class="game-image">
+                <div class="game-details">
+                    <div class="player-count">${details.minPlayers === details.maxPlayers ? details.minPlayers + (details.minPlayers > 1 ? ' players' : ' player'): details.minPlayers + '-'  + details.maxPlayers + ' players'}</div>
+                    <div class="playing-time">Time: ${details.playingTime} mins</div>
+                    <div class="weight">Complexity:${generateWeightBarsHTML(details.weight || 0)}</div>
+                </div>
+                <div class="rating" style="color: hsl(${details.rating * 12}, 100%, 50%)">${details.rating}</div>
+            </div>
+        `;
+        gameItem.addEventListener("click", () => openDrawer(details.id));
+        return gameItem;
     }
 
     fetchGameCollection("Glasenator");
