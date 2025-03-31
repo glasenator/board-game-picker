@@ -1,0 +1,194 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text color */
+}
+
+header {
+    background-color: #1f1f1f; /* Darker header background */
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+main {
+    padding: 1rem;
+}
+
+#game-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center; /* Center the rows of games */
+}
+
+.game-item {
+    background-color: #1e1e1e; /* Dark card background */
+    border: 1px solid #333; /* Subtle border for dark mode */
+    border-radius: 5px;
+    padding: 1rem 1rem 0.5rem 1rem;
+    width: calc(33.333% - 2rem); /* Default to three columns */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #e0e0e0; /* Light text color */
+}
+
+@media (max-width: 1024px) {
+    .game-item {
+        width: calc(50% - 2rem); /* Switch to two columns for medium screens */
+    }
+}
+
+@media (max-width: 600px) {
+    .game-item {
+        width: calc(100% - 2rem); /* Switch to one column for small screens */
+    }
+}
+
+.game-item-content {
+    display: flex;
+    justify-content: space-between; /* Space between game details and rating */
+    align-items: center; /* Align items vertically */
+    text-decoration: none; /* Remove underline from links */
+    color: inherit; /* Inherit text color */
+}
+
+.game-item h2 {
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem;
+}
+
+.game-item p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #b0b0b0; /* Softer text color for descriptions */
+}
+
+.game-item .rating {
+    font-size: 1.5rem; /* Increased font size */
+    font-weight: bold; /* Ensure bold style */
+    color: hsl(calc(rating * 12), 100%, 50%);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add subtle shadow for emphasis */
+}
+
+.game-image {
+    width: auto; /* Adjust width automatically */
+    height: 100px; /* Fixed height for images */
+    object-fit: cover; /* Ensure images maintain aspect ratio and fill the height */
+    border-radius: 5px;
+}
+
+#sort-container {
+    margin: 1rem 0;
+    text-align: center;
+}
+
+#sort-options {
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+#sort-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #333;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#sort-button:hover {
+    background-color: #444;
+}
+
+.game-details > div {
+    padding: 0.25rem 0; /* Add padding between items */
+}
+
+.weight {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.weight-bars {
+    display: flex;
+    position: relative;
+    top: -5px; /* Adjust position to align with text */
+    gap: 2px;
+    align-items: flex-end; /* Align bars to the bottom */
+    height: 20px; /* Total height of the tallest bar */
+}
+
+.weight-bar {
+    width: 4px;
+    background-color: #e0e0e0; /* Light bar color */
+    opacity: 0.3; /* Default to low opacity */
+}
+
+.weight-bar.active {
+    opacity: 1; /* Highlight active bars */
+}
+
+.categories {
+    text-align: center;
+}
+
+.detail-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.detail-drawer.open {
+    transform: translateX(0);
+}
+
+.detail-drawer.closing {
+    transform: translateX(100%);
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #ddd;
+}
+
+.detail-header h2 {
+    margin: 0;
+}
+
+.detail-header .close-drawer {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.detail-content {
+    padding: 1rem;
+}
+
+.detail-content .detail-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.detail-content p {
+    margin: 0.5rem 0;
+}

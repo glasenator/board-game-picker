@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BGG Game List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Glasenator's Board Game Collection</h1>
+        <div id="sort-container">
+            <label for="sort-options">Sort by:</label>
+            <select id="sort-options">
+                <option value="name">Name</option>
+                <option value="ranking">Ranking</option>
+                <option value="playercount">Player Count</option>
+                <option value="playtime">Playtime</option>
+                <option value="weight">Complexity</option> <!-- Add weight option -->
+            </select>
+        </div>
+    </header>
+    <main>
+        <div id="game-list">
+            <!-- Games will be dynamically loaded here -->
+        </div>
+    </main>
+    <script src="script.js" defer></script>
+</body>
+</html>
