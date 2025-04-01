@@ -8,6 +8,8 @@
 </head>
 <body>
     <header>
+        <h1 id="page-title">Glasenator's Board Game Collection</h1>
+        <button id="toggle-header" aria-label="Toggle header visibility">▲ Hide Filters</button>
         <div id="header-container">
             <div id="sort-container">
                 <label for="sort-options">Sort by:</label>
@@ -25,6 +27,7 @@
                 </div>
             </div>
             <div class="vertical-line"></div>
+            <div class="horizontal-line"></div>
             <div id="filter-container">
                 <div class="filter-group">
                     <label for="filter-name">Name:</label>
@@ -106,10 +109,10 @@
                 <hr class="detail-divider" />
                 <p><span id="detail-mechanics"></span></p>
                 <hr class="detail-divider" />
-                <p><strong>Players:</strong> <span id="detail-players"></span></p>
-                <p><strong>Playing Time:</strong> <span id="detail-time"></span></p>
+                <p><span id="detail-players"></span></p>
+                <p><span id="detail-time"></span></p>
                 <p><strong>Complexity:</strong> <span id="detail-complexity"></span></p>
-                <p><strong>Rating:</strong> <span id="detail-rating"></span></p>
+                <p><span id="detail-rating"></span></p>
             </div>
             <hr class="detail-divider" />
             <div class="detail-content-bottom">

@@ -23,6 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const detailMechanics = document.getElementById("detail-mechanics");
     const overlay = document.getElementById("overlay");
 
+    const toggleHeaderButton = document.getElementById("toggle-header");
+    const headerContainer = document.getElementById("header-container");
+
+    toggleHeaderButton.addEventListener("click", () => {
+        const isCollapsed = headerContainer.classList.toggle("collapsed");
+        toggleHeaderButton.textContent = isCollapsed ? "▼ Show Filters" : "▲ Hide Filters";
+    });
+
     closeDrawerButton.addEventListener("click", () => {
         detailDrawer.classList.remove("open");
         overlay.classList.remove("active");
@@ -301,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <img src="${details.imageUrl}" alt="${details.name}" class="game-image">
                 <div class="game-details">
                     <div class="player-count">${details.minPlayers === details.maxPlayers ? details.minPlayers + (details.minPlayers > 1 ? ' players' : ' player'): details.minPlayers + '-'  + details.maxPlayers + ' players'}</div>
-                    <div class="playing-time">Time: ${details.playingTime} mins</div>
+                    <div class="playing-time">${details.playingTime} mins</div>
                     <div class="weight">Complexity:${generateWeightBarsHTML(details.weight || 0)}</div>
                 </div>
                 <div class="rating" style="color: hsl(${details.rating * 12}, 100%, 50%)">${details.rating}</div>

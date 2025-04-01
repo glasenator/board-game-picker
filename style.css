@@ -110,7 +110,6 @@ main {
     color: #e0e0e0;
 }
 
-
 #sort-options {
     padding: 0.5rem;
     font-size: 1rem;
@@ -173,12 +172,27 @@ main {
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    padding: 1rem;
 }
 
 .vertical-line {
     width: 1px;
     height: 3rem;
     background-color: #444;
+}
+
+.horizontal-line {
+    width: 100%;
+    height: 1px;
+    background-color: #444;
+    display: none;
+}
+
+#sort-container, #filter-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    justify-content: center;
 }
 
 #filter-container {
@@ -190,6 +204,7 @@ main {
     display: flex; 
     flex-direction: column;
     text-align: left;
+    min-width: 150px; /* Ensure a minimum width for inputs */
 }
 
 #filter-container label {
@@ -347,6 +362,57 @@ main {
     width: auto;
 }
 
-.detail-content p {
+detail-content p {
     margin: 0.5rem 0;
+}
+
+#page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+#toggle-header {
+    background: none;
+    border: none;
+    color: #b0b0b0; /* Softer color */
+    font-size: 1rem; /* Reduced font size */
+    cursor: pointer;
+    margin: 0.5rem;
+    padding: 0.25rem 0.5rem; /* Reduced padding */
+}
+
+#toggle-header:hover {
+    color: #e0e0e0; /* Slightly lighter on hover */
+}
+
+#header-container.collapsed {
+    display: none;
+}
+
+@media (max-width: 1086px) {
+    .vertical-line {
+        display: none; /* Hide vertical line on small screens */
+    }
+    .horizontal-line{
+        display: block;;
+    }
+}
+
+@media (max-width: 600px) {
+    #header-container {
+        flex-direction: column; /* Stack elements vertically on small screens */
+        align-items: stretch; /* Stretch elements to fit the container */
+    }
+
+    #sort-container, #filter-container {
+        flex-direction: column; /* Stack elements vertically */
+        align-items: stretch;
+    }
+
+    .filter-group {
+        min-width: 100%; /* Full width for inputs on small screens */
+    }
 }
