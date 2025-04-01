@@ -45,11 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const xml = parser.parseFromString(text, "application/xml");
 
             const name = xml.querySelector("name[type='primary']")?.getAttribute("value") || "Unknown Game";
-            const description = xml.querySelector("description")?.textContent || "No description available.";
+            let description = xml.querySelector("description")?.textContent || "No description available.";
+            description = description.replace(/&#10;/g, "\n"); // Replace '&#10;' with line breaks
             const minPlayers = xml.querySelector("minplayers")?.getAttribute("value") || "N/A";
             const maxPlayers = xml.querySelector("maxplayers")?.getAttribute("value") || "N/A";
             const playingTime = xml.querySelector("playingtime")?.getAttribute("value") || "N/A";
-            const rating = xml.querySelector("average")?.getAttribute("value") || "N/A";
+            const rating = details.rating || "N/A";
             const imageUrl = xml.querySelector("image")?.textContent || "";
             const boardGameCategories = xml.querySelectorAll("link[type='boardgamecategory']");
             const boardGameMechanics = xml.querySelectorAll("link[type='boardgamemechanic']");
@@ -69,7 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (detailComplexity) {
                 detailComplexity.innerHTML = generateWeightBarsHTML(details.weight); // Generate complexity bars
             }
-            if (detailRating) detailRating.textContent = rating;
+            if (detailRating) {
+                detailRating.style.color = `hsl(${rating * 12}, 100%, 50%)`;
+                detailRating.textContent = rating;
+            }
             if (detailCategories) {
                 const categories = Array.from(boardGameCategories).map(cat => cat.getAttribute("value")).join(", ");
                 detailCategories.textContent = categories;
