@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const xml = parser.parseFromString(text, "application/xml");
 
             const name = xml.querySelector("name[type='primary']")?.getAttribute("value") || "Unknown Game";
+            const gameUrl = `https://boardgamegeek.com/boardgame/${details.id}`;
             let description = xml.querySelector("description")?.textContent || "No description available.";
             description = description.replace(/&#10;/g, "\n"); // Replace '&#10;' with line breaks
             const minPlayers = xml.querySelector("minplayers")?.getAttribute("value") || "N/A";
@@ -63,7 +64,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const boardGameCategories = xml.querySelectorAll("link[type='boardgamecategory']");
             const boardGameMechanics = xml.querySelectorAll("link[type='boardgamemechanic']");
 
-            if (detailTitle) detailTitle.textContent = name;
+            const detailTitleLink = document.getElementById("detail-title-link");
+            if (detailTitleLink) {
+                detailTitleLink.textContent = name;
+                detailTitleLink.href = gameUrl;
+            }
             if (detailImage) {
                 detailImage.src = imageUrl;
                 detailImage.alt = name;
@@ -76,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (detailTime) detailTime.textContent = `${playingTime} mins`;
             if (detailComplexity) {
-                detailComplexity.innerHTML = generateWeightBarsHTML(details.weight); // Generate complexity bars
+                detailComplexity.innerHTML = convertWeightToTeach(details.weight);
             }
             if (detailRating) {
                 detailRating.style.color = `hsl(${rating * 12}, 100%, 50%)`;
@@ -115,37 +120,46 @@ document.addEventListener("DOMContentLoaded", () => {
     filterPlayingTime.addEventListener("change", filterGames);
     filterComplexity.addEventListener("change", filterGames);
 
+    document.getElementById("clear-filters").addEventListener("click", () => {
+        filterNameInput.value = "";
+        filterPlayerCount.value = "";
+        filterRating.value = "";
+        filterPlayingTime.value = "";
+        filterComplexity.value = "";
+        filterGames(); // Reapply filters to show all games
+    });
+
     function filterGames() {
-        const filterText = filterNameInput.value.toLowerCase();
-        const selectedPlayerCount = filterPlayerCount.value;
-        const selectedRating = filterRating.value;
-        const selectedPlayingTime = filterPlayingTime.value;
-        const selectedComplexity = filterComplexity.value;
-        const gameItems = Array.from(gameListContainer.children);
+        const filters = {
+            text: filterNameInput.value.toLowerCase(),
+            playerCount: filterPlayerCount.value,
+            rating: parseFloat(filterRating.value) || null,
+            playingTime: parseInt(filterPlayingTime.value) || null,
+            complexity: filterComplexity.value,
+        };
 
-        gameItems.forEach(gameItem => {
-            const gameName = gameItem.querySelector("h2").textContent.toLowerCase();
-            const playerCountText = gameItem.querySelector(".player-count").textContent;
-            const playerCounts = playerCountText.match(/\d+/g).map(Number);
-            const gameRating = parseFloat(gameItem.querySelector(".rating").textContent) || 0;
-            const gamePlayingTime = parseInt(gameItem.querySelector(".playing-time").textContent.match(/\d+/)) || 0;
+        Array.from(gameListContainer.children).forEach(gameItem => {
+            const gameData = {
+                name: gameItem.querySelector("h2").textContent.toLowerCase(),
+                playerCounts: gameItem.querySelector(".player-count").textContent.match(/\d+/g).map(Number),
+                rating: parseFloat(gameItem.querySelector(".rating").textContent) || 0,
+                playingTime: parseInt(gameItem.querySelector(".playing-time").textContent.match(/\d+/)) || 0,
+                complexity: gameItem.querySelector(".teach")?.textContent || "",
+            };
 
-            // Fix: Ensure `.weight` element is correctly parsed
-            const weightElement = gameItem.querySelector(".weight .weight-bars");
-            const activeBars = weightElement ? weightElement.querySelectorAll(".weight-bar.active").length : 0;
-            const gameComplexity = activeBars;
+            const matches = {
+                name: gameData.name.includes(filters.text),
+                playerCount: !filters.playerCount || (
+                    gameData.playerCounts.length === 2
+                        ? filters.playerCount >= gameData.playerCounts[0] && filters.playerCount <= gameData.playerCounts[1]
+                        : filters.playerCount == gameData.playerCounts[0]
+                ),
+                rating: !filters.rating || gameData.rating >= filters.rating,
+                playingTime: !filters.playingTime || gameData.playingTime >= filters.playingTime,
+                complexity: !filters.complexity || gameData.complexity === filters.complexity,
+            };
 
-            const matchesPlayerCount = !selectedPlayerCount || 
-                (playerCounts.length === 2 
-                    ? selectedPlayerCount >= playerCounts[0] && selectedPlayerCount <= playerCounts[1]
-                    : selectedPlayerCount == playerCounts[0]);
-
-            const matchesRating = !selectedRating || gameRating >= parseFloat(selectedRating);
-            const matchesPlayingTime = !selectedPlayingTime || gamePlayingTime >= parseInt(selectedPlayingTime);
-            const matchesComplexity = !selectedComplexity || gameComplexity === parseFloat(selectedComplexity);
-            const matchesName = gameName.includes(filterText);
-
-            gameItem.style.display = matchesName && matchesPlayerCount && matchesRating && matchesPlayingTime && matchesComplexity ? "" : "none";
+            gameItem.style.display = Object.values(matches).every(Boolean) ? "" : "none";
         });
     }
 
@@ -166,9 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 case "playtime":
                     return parseInt(gameItem.querySelector(".playing-time").textContent.match(/\d+/)) || 0;
                 case "weight":
-                    // Fix: Parse the number of active weight bars for complexity
-                    const weightElement = gameItem.querySelector(".weight .weight-bars");
-                    return weightElement ? weightElement.querySelectorAll(".weight-bar.active").length : 0;
+                    return parseFloat(gameItem.querySelector(".weight").textContent) || 0;
                 default:
                     return 0;
             }
@@ -227,6 +239,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return barsHTML;
     }
 
+    function convertWeightToTeach(weight) {
+        if (weight <= 1.42) return "Learn immediately!";
+        else if (weight <= 1.91) return "Needs a brief explanation.";
+        else if (weight <= 2.2) return "You will need to think a bit.";
+        else if (weight <= 2.4) return "Looking for a challenge";
+        else if (weight <= 3) return "Brain power 100% required.";
+        else if (weight <= 5) return "Your head will explode!";
+        else return "N/A";
+    }
+
     async function fetchGameCollection(username) {
         try {
             const collectionResponse = await fetch(`https://boardgamegeek.com/xmlapi2/collection?username=${username}`);
@@ -256,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             items.forEach(item => {
                 const name = item.querySelector("name")?.textContent || "Unknown Game";
-                const gameId = item.getAttribute("objectid");
+                const gameId = Number(item.getAttribute("objectid"));
                 const imageUrl = item.querySelector("image")?.textContent || "https://media.istockphoto.com/id/1295474183/vector/surprise-mystery-box-icon.jpg?s=612x612&w=0&k=20&c=ebChMCVwLzK6ZL40ZRwRDKmep7fsslAJOIPp9WlsSJI="; // Fallback image
                 const owned = item.querySelector("status")?.getAttribute("own") === "1";
                 console.log(item);
@@ -281,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     gameListContainer.appendChild(createGameCard({
                         name,
-                        id: item.getAttribute("objectid"),
+                        id: gameId,
                         imageUrl,
                         minPlayers: details.minPlayers,
                         maxPlayers: details.maxPlayers,
@@ -310,7 +332,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="game-details">
                     <div class="player-count">${details.minPlayers === details.maxPlayers ? details.minPlayers + (details.minPlayers > 1 ? ' players' : ' player'): details.minPlayers + '-'  + details.maxPlayers + ' players'}</div>
                     <div class="playing-time">${details.playingTime} mins</div>
-                    <div class="weight">Complexity:${generateWeightBarsHTML(details.weight || 0)}</div>
+                    <span class="weight">${details.weight}</span>
+                    <div class="teach">${convertWeightToTeach(details.weight)}</div>
                 </div>
                 <div class="rating" style="color: hsl(${details.rating * 12}, 100%, 50%)">${details.rating}</div>
             </div>

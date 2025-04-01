@@ -81,13 +81,15 @@
                     <label for="filter-weight">Complexity:</label>
                     <select id="filter-weight">
                         <option value="">Any</option>
-                        <option value="1">Easy</option>
-                        <option value="2">Normal</option>
-                        <option value="3">Difficult</option>
-                        <option value="4">Really Hard</option>
-                        <option value="5">Impossible</option>
+                        <option value="Learn immediately!">Learn immediately!</option>
+                        <option value="Needs a brief explanation.">Needs a brief explanation.</option>
+                        <option value="You will need to think a bit.">You will need to think a bit.</option>
+                        <option value="Looking for a challenge">Looking for a challenge</option>
+                        <option value="Brain power 100% required.">Brain power 100% required.</option>
+                        <option value="Your head will explode!">Your head will explode!</option>
                     </select>
                 </div>
+                <button id="clear-filters" aria-label="Clear all filters">Clear Filters</button>
             </div>
         </div>
     </header>
@@ -100,19 +102,23 @@
     <div id="detail-drawer" class="detail-drawer">
         <div class="detail-header">
             <button id="close-drawer" class="close-drawer" aria-label="Close drawer">✖</button>
-            <h2 id="detail-title">Game Details</h2>
+            <h2 id="detail-title">
+                <a id="detail-title-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+            </h2>
         </div>
         <div class="detail-content">
             <div class="detail-content-top">
                 <img id="detail-image" class="detail-image" src="" alt="Game Image">
+                <p><strong><span id="detail-rating"></span></strong></p>
                 <p><span id="detail-categories"></span></p>
                 <hr class="detail-divider" />
                 <p><span id="detail-mechanics"></span></p>
                 <hr class="detail-divider" />
-                <p><span id="detail-players"></span></p>
-                <p><span id="detail-time"></span></p>
-                <p><strong>Complexity:</strong> <span id="detail-complexity"></span></p>
-                <p><span id="detail-rating"></span></p>
+                <div class="detail-stats">
+                    <p><span id="detail-players"></span></p>
+                    <p><span id="detail-time"></span></p>
+                </div>
+                <p><span id="detail-complexity"></span></p>
             </div>
             <hr class="detail-divider" />
             <div class="detail-content-bottom">

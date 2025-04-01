@@ -140,9 +140,7 @@ main {
 }
 
 .weight {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
+    /* display: none; */
 }
 
 .weight-bars {
@@ -235,6 +233,23 @@ main {
     color: #e0e0e0;
 }
 
+#clear-filters {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #444;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    align-self: center; /* Align with filters */
+}
+
+#clear-filters:hover {
+    background-color: #555;
+    color: #ffffff;
+}
+
 .detail-drawer {
     position: fixed;
     top: 0;
@@ -311,6 +326,18 @@ main {
     text-align: center;
 }
 
+.detail-stats {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+.detail-stats p {
+    margin: 0;
+    font-size: 1rem;
+    color: #e0e0e0; /* Light text color */
+}
+
 .detail-image {
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Added shadow for emphasis */
@@ -323,10 +350,9 @@ main {
 }
 
 .detail-content p {
-    margin: 0.5rem 0;
-    line-height: 1.5;
+    margin: 0rem;
+    line-height: 1.3rem;
     display: flex;
-    gap: 0.5rem;
 }
 
 .detail-content p strong {
@@ -358,12 +384,13 @@ main {
 }
 
 .detail-image {
-    max-height: 20rem;
-    width: auto;
+    margin: auto;
+    max-width: 21rem;
+    max-height: 21rem;
 }
 
-detail-content p {
-    margin: 0.5rem 0;
+#detail-rating {
+    font-size: xx-large;
 }
 
 #page-title {
@@ -390,6 +417,15 @@ detail-content p {
 
 #header-container.collapsed {
     display: none;
+}
+
+#detail-title a {
+    color: inherit; /* Inherit the default text color */
+    text-decoration: none; /* Remove underline */
+}
+
+#detail-title a:hover {
+    text-decoration: underline; /* Add underline on hover for clarity */
 }
 
 @media (max-width: 1086px) {
