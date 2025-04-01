@@ -93,6 +93,7 @@
             <!-- Games will be dynamically loaded here -->
         </div>
     </main>
+    <div id="overlay"></div>
     <div id="detail-drawer" class="detail-drawer">
         <div class="detail-header">
             <button id="close-drawer" class="close-drawer" aria-label="Close drawer">✖</button>
@@ -101,13 +102,16 @@
         <div class="detail-content">
             <div class="detail-content-top">
                 <img id="detail-image" class="detail-image" src="" alt="Game Image">
-                <p><strong>Categories:</strong><span id="detail-categories"></span></p>
+                <p><strong>Categories:</strong> <span id="detail-categories"></span></p>
+                <p><strong>Mechanics:</strong> <span id="detail-mechanics"></span></p>
                 <p><strong>Players:</strong> <span id="detail-players"></span></p>
                 <p><strong>Playing Time:</strong> <span id="detail-time"></span></p>
                 <p><strong>Complexity:</strong> <span id="detail-complexity"></span></p>
                 <p><strong>Rating:</strong> <span id="detail-rating"></span></p>
             </div>
-            <p id="detail-description"></p>
+            <div class="detail-content-bottom">
+                <p id="detail-description"></p>
+            </div>
         </div>
     </div>
     <script src="script.js" defer></script>

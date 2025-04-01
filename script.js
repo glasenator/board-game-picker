@@ -17,17 +17,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const detailDescription = document.getElementById("detail-description");
     const detailPlayers = document.getElementById("detail-players");
     const detailTime = document.getElementById("detail-time");
-    const detailComplexity = document.getElementById("detail-weight");
+    const detailComplexity = document.getElementById("detail-complexity");
     const detailRating = document.getElementById("detail-rating");
     const detailCategories = document.getElementById("detail-categories");
+    const detailMechanics = document.getElementById("detail-mechanics");
+    const overlay = document.getElementById("overlay");
 
     closeDrawerButton.addEventListener("click", () => {
         detailDrawer.classList.remove("open");
+        overlay.classList.remove("active");
+        document.body.classList.remove("drawer-open");
     });
 
-    async function openDrawer(id) {
+    overlay.addEventListener("click", () => {
+        detailDrawer.classList.remove("open");
+        overlay.classList.remove("active");
+        document.body.classList.remove("drawer-open");
+    });
+
+    async function openDrawer(details) {
         try {
-            const response = await fetch(`https://boardgamegeek.com/xmlapi2/thing?id=${id}`);
+            const response = await fetch(`https://boardgamegeek.com/xmlapi2/thing?id=${details.id}`);
             if (!response.ok) throw new Error("Failed to fetch game details");
 
             const text = await response.text();
@@ -39,10 +49,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const minPlayers = xml.querySelector("minplayers")?.getAttribute("value") || "N/A";
             const maxPlayers = xml.querySelector("maxplayers")?.getAttribute("value") || "N/A";
             const playingTime = xml.querySelector("playingtime")?.getAttribute("value") || "N/A";
-            const weight = xml.querySelector("averageweight")?.getAttribute("value") || "N/A";
             const rating = xml.querySelector("average")?.getAttribute("value") || "N/A";
             const imageUrl = xml.querySelector("image")?.textContent || "";
             const boardGameCategories = xml.querySelectorAll("link[type='boardgamecategory']");
+            const boardGameMechanics = xml.querySelectorAll("link[type='boardgamemechanic']");
 
             if (detailTitle) detailTitle.textContent = name;
             if (detailImage) {
@@ -56,17 +66,27 @@ document.addEventListener("DOMContentLoaded", () => {
                     : `${minPlayers} - ${maxPlayers} players`;
             }
             if (detailTime) detailTime.textContent = `${playingTime} mins`;
-            if (detailComplexity) detailComplexity.textContent = weight;
+            if (detailComplexity) {
+                detailComplexity.innerHTML = generateWeightBarsHTML(details.weight); // Generate complexity bars
+            }
             if (detailRating) detailRating.textContent = rating;
             if (detailCategories) {
                 const categories = Array.from(boardGameCategories).map(cat => cat.getAttribute("value")).join(", ");
                 detailCategories.textContent = categories;
             }
+            if (detailMechanics) {
+                const mechanics = Array.from(boardGameMechanics).map(mech => mech.getAttribute("value")).join(", ");
+                detailMechanics.textContent = mechanics;
+            }
 
             detailDrawer.classList.add("open");
+            overlay.classList.add("active");
+            document.body.classList.add("drawer-open");
         } catch (error) {
             console.error("Error fetching game details:", error);
             detailDrawer.classList.remove("open");
+            overlay.classList.remove("active");
+            document.body.classList.remove("drawer-open");
         }
     }
 
@@ -283,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="rating" style="color: hsl(${details.rating * 12}, 100%, 50%)">${details.rating}</div>
             </div>
         `;
-        gameItem.addEventListener("click", () => openDrawer(details.id));
+        gameItem.addEventListener("click", () => openDrawer(details));
         return gameItem;
     }
 
