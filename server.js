@@ -2,9 +2,9 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const BASE_DIR = path.join(__dirname);
-const COLLECTION_FILE = path.join(BASE_DIR, "collection.csv");
+const COLLECTION_FILE = path.join(BASE_DIR, "src/collection.csv");
 
 const parseCSV = (data) => {
     const lines = data.split("\n");
@@ -54,7 +54,7 @@ const server = http.createServer((req, res) => {
             res.end(JSON.stringify(collection));
         });
     } else {
-        const filePath = path.join(BASE_DIR, req.url === "/" ? "index.html" : req.url);
+        const filePath = path.join(BASE_DIR, req.url === "/" ? "src/index.html" : req.url);
         const ext = path.extname(filePath).toLowerCase();
 
         const mimeTypes = {
