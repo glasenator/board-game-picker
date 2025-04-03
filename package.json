@@ -1,6 +1,29 @@
 {
+  "name": "board-game-picker",
+  "version": "1.0.0",
+  "description": "A simple node web app that shows my board game collection",
+  "homepage": "https://github.com/glasenator/board-game-picker#readme",
+  "bugs": {
+    "url": "https://github.com/glasenator/board-game-picker/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glasenator/board-game-picker.git"
+  },
+  "license": "MIT",
+  "author": "glasenator",
+  "type": "commonjs",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
   "dependencies": {
     "csv-parser": "^3.2.0",
     "csvtojson": "^2.0.10"
-  }
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "devDependencies": {}
 }
