@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BGG Game List</title>
+    <title>Glasenator's Board Game Collection</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* Ensure wood.jpg is accessible */
@@ -11,13 +11,14 @@
             background-image: url('wood.jpg');
         }
     </style>
+    <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
     <header>
         <h1 id="page-title">Glasenator's Board Game Collection</h1>
         <hr />
-        <button id="toggle-header" aria-label="Toggle header visibility">▲ Hide Filters</button>
-        <div id="header-container">
+        <button id="toggle-header" aria-label="Toggle header visibility">▼ Show Filters</button>
+        <div id="header-container" class="collapsed">
             <div id="sort-container">
                 <label for="sort-options">Sort by:</label>
                 <div>
