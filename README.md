@@ -4,6 +4,9 @@ https://board-game-collection-6547f6f8fce1.herokuapp.com/
 
 This is a personal web project that displays a sortable, filterable list of board games from my own collection. The game data is pulled from [BoardGameGeek](https://boardgamegeek.com), and the site allows for interactive browsing and exploration.
 
+<img width="1374" alt="Screenshot 2025-04-16 at 4 55 27 PM" src="https://github.com/user-attachments/assets/220d4dec-af29-45a2-ae3a-97251cc2fa8d" />
+
+
 ## 🔧 Features
 
 - 🧩 Displays a curated list of board games from my personal collection
